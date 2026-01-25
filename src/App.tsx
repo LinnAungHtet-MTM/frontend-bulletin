@@ -5,6 +5,8 @@ import ForgotPassword from "./pages/auth/ForgotPassword";
 import ResetPassword from "./pages/auth/ResetPassword";
 import PostList from "./pages/posts/List";
 import UserList from "./pages/users/List";
+import UserCreate from "./pages/users/create";
+import UserEdit from "./pages/users/edit";
 
 function App() {
   return (
@@ -17,6 +19,8 @@ function App() {
           <Route element={<ProtectedRoute />}>
             <Route path="/posts" element={<PostList />} />
             <Route path="/users" element={<UserList />} />
+            <Route path="users/create" element={<UserCreate/>} />
+            <Route path="users/edit/:userId" element={<UserEdit/>} />
           </Route>
         </Routes>
       </BrowserRouter>

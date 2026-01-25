@@ -49,7 +49,7 @@ const Login = () => {
       />
       {/* Glass Card */}
       <div
-        className="relative w-[400px] rounded-3xl
+        className="relative w-100 rounded-3xl
         bg-white/20 backdrop-blur-3xl border border-white shadow-[0_20px_50px_rgba(0,0,0,0.1)] p-8"
       >
         {/* Logo */}

@@ -32,9 +32,5 @@ export const ResetPasswordSchema = z.object({
     .string()
     .min(1, "Confirm Password field is required")
 })
-  // .refine((data) => data.password === data.confirm_password, {
-  //   message: "Passwords do not match",
-  //   path: ["confirm_password"], // show error on confirm_password field
-  // });
 
 export type ResetPasswordForm = z.infer<typeof ResetPasswordSchema>;

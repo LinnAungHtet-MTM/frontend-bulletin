@@ -110,7 +110,6 @@ export const useResetPassword = () => {
             const res = err.response?.data;
             // Pydantic / backend validation errors
             if (Array.isArray(res)) {
-                console.log(res);
                 res.forEach((e) => {
                     form.setError(e.loc[0] as keyof ResetPasswordForm, {
                         type: "server",
