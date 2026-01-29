@@ -7,10 +7,16 @@ export interface PaginationMeta {
   has_prev: boolean;
 }
 
-export interface SearchType {
+export interface SearchUserType {
   name?: string;
   email?: string;
   role?: number;
   start_date?: string;
   end_date?: string;
+}
+
+export interface SearchPostType {
+  keyword?: string;
+  status?: number;
+  date?: string;
 }

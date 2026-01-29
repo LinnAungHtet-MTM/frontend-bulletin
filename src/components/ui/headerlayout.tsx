@@ -130,14 +130,14 @@ export default function HeaderLayout() {
                   <SidebarMenuSub>
                     <SidebarMenuSubItem>
                       <SidebarMenuSubButton asChild>
-                        <a href="#">
+                        <a href="/posts">
                           <span>Post List</span>
                         </a>
                       </SidebarMenuSubButton>
                     </SidebarMenuSubItem>
                     <SidebarMenuSubItem>
                       <SidebarMenuSubButton asChild>
-                        <a href="#">
+                        <a href="/posts/create">
                           <span>Post Create</span>
                         </a>
                       </SidebarMenuSubButton>
@@ -198,13 +198,15 @@ export default function HeaderLayout() {
                 <DropdownMenuSeparator />
 
                 <DropdownMenuGroup>
-                  <DropdownMenuItem>
-                    <UserRoundCog className="mr-2 size-4" />
-                    Profile
-                  </DropdownMenuItem>
+                  <Link to="/user/profile">
+                    <DropdownMenuItem className="cursor-pointer">
+                      <UserRoundCog className="mr-2 size-4" />
+                      Profile
+                    </DropdownMenuItem>
+                  </Link>
                   <DropdownMenuItem
                     onClick={handleLogout}
-                    className="text-destructive"
+                    className="text-destructive cursor-pointer"
                   >
                     <LogOut className="mr-2 size-4" />
                     Log out

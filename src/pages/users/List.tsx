@@ -217,427 +217,453 @@ const UserList = () => {
     <>
       <SidebarProvider>
         <HeaderLayout />
-        <SidebarInset>
-          <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4 dark:bg-slate-950">
+        <SidebarInset className="flex flex-col overflow-hidden">
+          {" "}
+          <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4 bg-white dark:bg-slate-950 z-10">
             <SidebarTrigger className="-ml-1" />
             <ModeToggle />
           </header>
-
           {/* Main Content Area */}
-          <div className="min-h-screen flex-1 relative bg-[#f8fafc] dark:bg-slate-950 overflow-hidden p-2 transition-colors duration-300">
-            <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-linear-to-br from-indigo-500/20 to-purple-500/20 rounded-full blur-[100px] animate-pulse" />
-            <div className="absolute bottom-[0%] right-[-5%] w-[35%] h-[35%] bg-linear-to-tr from-sky-500/20 to-emerald-500/20 rounded-full blur-[100px]" />
-
-            <div
-              className="relative h-full rounded-[2rem] bg-white/40 dark:bg-slate-900/40 backdrop-blur-2xl border border-white/60 dark:border-slate-800/50 
-                         shadow-[0_8px_32px_0_rgba(31,38,135,0.07)] overflow-hidden"
-            >
-              <div className="relative p-8">
-                <div className="mb-6">
-                  <h2 className="text-2xl font-bold text-slate-800/80 dark:text-slate-100">
+          <div className="flex-1 relative bg-[#f8fafc] dark:bg-slate-950 overflow-hidden p-2 sm:p-4">
+            {/* Background */}
+            <div className="hidden lg:block absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-indigo-500/10 rounded-full blur-[100px]" />
+            <div className="relative flex flex-col rounded-[1.5rem] sm:rounded-[2rem] bg-white/40 dark:bg-slate-900/40 backdrop-blur-2xl border border-white/60 dark:border-slate-800/50 shadow-sm">
+              {/* Header & Filters Section */}
+              <div className="p-4 sm:p-6 lg:p-8 pb-0 sm:pb-0 lg:pb-0 shrink-0">
+                <div className="mb-4">
+                  <h2 className="text-xl font-bold text-slate-800/80 dark:text-slate-100">
                     User Management
                   </h2>
-                  <p className="text-sm text-slate-500 dark:text-slate-400">
-                    Manage and organize your bulletins with ease.
+                  <p className="text-xs text-slate-500">
+                    Manage and organize your users with ease.
                   </p>
                 </div>
 
-                {/* Search Post List */}
-                <div className="flex items-center gap-3 mb-6">
-                  <Input
-                    placeholder="Search Username & Email"
-                    value={keyword}
-                    onChange={(e) => setKeyword(e.target.value)}
-                    className="w-75 rounded-lg bg-white/70
-                                focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0"
-                  />
-                  <Select value={role?.toString()} onValueChange={setRole}>
-                    <SelectTrigger className="w-50">
-                      <SelectValue placeholder="Select Role" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectGroup>
-                        <SelectItem value="0">Admin</SelectItem>
-                        <SelectItem value="1">User</SelectItem>
-                      </SelectGroup>
-                    </SelectContent>
-                  </Select>
-
-                  <Popover open={open} onOpenChange={setOpen}>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant="outline"
-                        id="date"
-                        className="w-50 justify-between font-normal"
-                      >
-                        {startDate
-                          ? startDate.toLocaleDateString()
-                          : "Created Start Date"}
-                        <CalendarDays />
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent
-                      className="w-auto overflow-hidden p-0"
-                      align="start"
-                    >
-                      <Calendar
-                        mode="single"
-                        selected={startDate}
-                        captionLayout="dropdown"
-                        onSelect={(d) => {
-                          setStartDate(d);
-                          setOpen(false);
-                        }}
+                <div className="flex flex-col gap-4 mb-4">
+                  <div className="grid grid-cols-1 md:grid-cols-1 xl:flex xl:items-center gap-4">
+                    <div className="w-full xl:w-auto">
+                      <Input
+                        placeholder="Search Username & Email..."
+                        value={keyword}
+                        onChange={(e) => setKeyword(e.target.value)}
+                        className="w-full xl:w-[280px] bg-white/70 focus-visible:ring-1 focus-visible:ring-sky-500"
                       />
-                    </PopoverContent>
-                  </Popover>
+                    </div>
 
-                  <Popover open={open1} onOpenChange={setOpen1}>
-                    <PopoverTrigger asChild>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 w-full xl:w-auto flex-1">
+                      <Select value={role?.toString()} onValueChange={setRole}>
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Select Role" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectGroup>
+                            <SelectItem value="0">Admin</SelectItem>
+                            <SelectItem value="1">User</SelectItem>
+                          </SelectGroup>
+                        </SelectContent>
+                      </Select>
+
+                      <Popover open={open} onOpenChange={setOpen}>
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant="outline"
+                            className="w-full justify-between font-normal bg-white/70"
+                          >
+                            <span className="truncate">
+                              {startDate
+                                ? startDate.toLocaleDateString()
+                                : "Start Date"}
+                            </span>
+                            <CalendarDays className="h-4 w-4 opacity-50 shrink-0" />
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={startDate}
+                            captionLayout="dropdown"
+                            onSelect={(d) => {
+                              setStartDate(d);
+                              setOpen(false);
+                            }}
+                          />
+                        </PopoverContent>
+                      </Popover>
+
+                      <Popover open={open1} onOpenChange={setOpen1}>
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant="outline"
+                            className="w-full justify-between font-normal bg-white/70"
+                          >
+                            <span className="truncate">
+                              {endDate
+                                ? endDate.toLocaleDateString()
+                                : "End Date"}
+                            </span>
+                            <CalendarDays className="h-4 w-4 opacity-50 shrink-0" />
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={endDate}
+                            captionLayout="dropdown"
+                            onSelect={(d) => {
+                              setEndDate(d);
+                              setOpen1(false);
+                            }}
+                          />
+                        </PopoverContent>
+                      </Popover>
+                    </div>
+
+                    <div className="flex gap-2 w-full xl:w-auto pt-2 xl:pt-0">
                       <Button
-                        variant="outline"
-                        id="date"
-                        className="w-50 justify-between font-normal"
-                      >
-                        {endDate
-                          ? endDate.toLocaleDateString()
-                          : "Created End Date"}
-                        <CalendarDays />
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent
-                      className="w-auto overflow-hidden p-0"
-                      align="start"
-                    >
-                      <Calendar
-                        mode="single"
-                        selected={endDate}
-                        captionLayout="dropdown"
-                        onSelect={(d) => {
-                          setEndDate(d);
-                          setOpen1(false);
-                        }}
-                      />
-                    </PopoverContent>
-                  </Popover>
-
-                  <Button
-                    onClick={handleReset}
-                    className="relative rounded-lg text-white font-medium cursor-pointer bg-red-500 hover:bg-red-600
-                      transition-all duration-300 hover:scale-[1.02] shadow-[0_4px_14px_0_rgba(14,165,233,0.39)] hover:shadow-sky-500/50"
-                  >
-                    Reset
-                  </Button>
-                  <Button
-                    onClick={handleSearch}
-                    className="relative rounded-lg text-white font-medium cursor-pointer bg-sky-500 hover:bg-sky-600
-                      transition-all duration-300 hover:scale-[1.02] shadow-[0_4px_14px_0_rgba(14,165,233,0.39)] hover:shadow-sky-500/50"
-                  >
-                    Search
-                  </Button>
-                </div>
-
-                {/* Unlock/ Delete Button */}
-                <div className="flex gap-3 mb-3">
-                  <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                      <Button
-                        disabled={selectedUsersData.length == 0}
+                        onClick={handleSearch}
                         className="relative rounded-lg text-white font-medium cursor-pointer bg-sky-500 hover:bg-sky-600
                       transition-all duration-300 hover:scale-[1.02] shadow-[0_4px_14px_0_rgba(14,165,233,0.39)] hover:shadow-sky-500/50"
                       >
-                        {actionLabel}
+                        Search
                       </Button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent className="w-100">
-                      <AlertDialogHeader>
-                        <AlertDialogTitle className="text-xl">
-                          Account Unlock
-                        </AlertDialogTitle>
-                        <AlertDialogDescription className="text-md font-semibold">
-                          Are you sure you want to {actionLabel.toLowerCase()}{" "}
-                          selected users?
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel className="cursor-pointer">
-                          Cancel
-                        </AlertDialogCancel>
-                        <AlertDialogAction
+                      <Button
+                        onClick={handleReset}
+                        className="relative rounded-lg text-white font-medium cursor-pointer bg-red-500 hover:bg-red-600
+                      transition-all duration-300 hover:scale-[1.02] shadow-[0_4px_14px_0_rgba(14,165,233,0.39)] hover:shadow-sky-500/50"
+                      >
+                        Reset
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Table Area */}
+              <div className="p-4 sm:p-6 lg:p-8 pt-2">
+                <div className="flex justify-between gap-4 border-slate-100 dark:border-slate-800 pt-4">
+                  <div className="flex flex-wrap items-center gap-3">
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button
+                          disabled={selectedUsersData.length === 0}
                           className="relative rounded-lg text-white font-medium cursor-pointer bg-sky-500 hover:bg-sky-600
-                          transition-all duration-300 hover:scale-[1.02] shadow-[0_4px_14px_0_rgba(14,165,233,0.39)] hover:shadow-sky-500/50"
-                          onClick={handleLockAction}
+                      transition-all duration-300 hover:scale-[1.02] shadow-[0_4px_14px_0_rgba(14,165,233,0.39)] hover:shadow-sky-500/50"
                         >
                           {actionLabel}
-                        </AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
-                  <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                      <Button
-                        disabled={selectedUsersData.length == 0}
-                        className="relative rounded-lg text-white font-medium cursor-pointer bg-red-500 hover:bg-red-600
-                          transition-all duration-300 hover:scale-[1.02] shadow-[0_4px_14px_0_rgba(14,165,233,0.39)] hover:shadow-sky-500/50"
-                      >
-                        Delete
-                      </Button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent className="w-100">
-                      <AlertDialogHeader>
-                        <AlertDialogTitle className="text-xl">
-                          Delete Users
-                        </AlertDialogTitle>
-                        <AlertDialogDescription className="text-md font-semibold">
-                          Do you want to delete the selected users?
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel className="cursor-pointer">
-                          Cancel
-                        </AlertDialogCancel>
-                        <AlertDialogAction
+                        </Button>
+                      </AlertDialogTrigger>
+
+                      <AlertDialogContent className="max-w-md">
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Account Unlock</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            Are you sure you want to {actionLabel.toLowerCase()}{" "}
+                            selected users?
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction
+                            onClick={handleLockAction}
+                            className="relative rounded-lg text-white font-medium cursor-pointer bg-sky-500 hover:bg-sky-600
+                      transition-all duration-300 hover:scale-[1.02] shadow-[0_4px_14px_0_rgba(14,165,233,0.39)] hover:shadow-sky-500/50"
+                          >
+                            {actionLabel}
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button
+                          disabled={selectedUsersData.length === 0}
                           className="relative rounded-lg text-white font-medium cursor-pointer bg-red-500 hover:bg-red-600
-                          transition-all duration-300 hover:scale-[1.02] shadow-[0_4px_14px_0_rgba(14,165,233,0.39)] hover:shadow-sky-500/50"
-                          onClick={handleDeleteAction}
+                      transition-all duration-300 hover:scale-[1.02] shadow-[0_4px_14px_0_rgba(14,165,233,0.39)] hover:shadow-sky-500/50"
                         >
                           Delete
-                        </AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
+                        </Button>
+                      </AlertDialogTrigger>
+
+                      <AlertDialogContent className="max-w-md">
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Delete Users</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            Do you want to delete the selected users? This
+                            action cannot be undone.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction
+                            onClick={handleDeleteAction}
+                            className="relative rounded-lg text-white font-medium cursor-pointer bg-red-500 hover:bg-red-600
+                      transition-all duration-300 hover:scale-[1.02] shadow-[0_4px_14px_0_rgba(14,165,233,0.39)] hover:shadow-sky-500/50"
+                          >
+                            Delete
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+
+                    {selectedUsersData.length > 0 && (
+                      <span className="text-xs text-slate-500 ml-1 animate-in fade-in slide-in-from-left-2">
+                        {selectedUsersData.length} users selected
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="flex justify-center md:justify-end">
+                    <PaginationLayout meta={meta} setPage={setPage} />
+                  </div>
                 </div>
 
-                {/* Pagination */}
-                <PaginationLayout meta={meta} setPage={setPage} />
-                {/* Post list Table */}
-                <div className="rounded-xl border border-white/10 dark:border-slate-800 bg-white/10 dark:bg-slate-900/20 overflow-hidden p-6">
-                  <Table>
-                    <TableHeader className="bg-white/50 dark:bg-slate-800/50 backdrop-blur-md">
-                      <TableRow className="hover:bg-transparent border-white/40 dark:border-slate-700">
-                        <TableHead className="w-12.5">
-                          <Checkbox
-                            className="border-slate-300 dark:border-slate-600"
-                            checked={selectedRows.length > 0}
-                            onCheckedChange={(checked) =>
-                              handleSelectAll(checked)
-                            }
-                          />
-                        </TableHead>
-                        <TableHead className="font-semibold text-slate-700 dark:text-slate-200">
-                          ID
-                        </TableHead>
-                        <TableHead className="font-semibold text-slate-700 dark:text-slate-200">
-                          Name
-                        </TableHead>
-                        <TableHead className="font-semibold text-slate-700 dark:text-slate-200">
-                          Email
-                        </TableHead>
-                        <TableHead className="font-semibold text-slate-700 dark:text-slate-200">
-                          Role
-                        </TableHead>
-                        <TableHead className="font-semibold text-slate-700 dark:text-slate-200">
-                          Status
-                        </TableHead>
-                        <TableHead className="font-semibold text-slate-700 dark:text-slate-200">
-                          Created Date
-                        </TableHead>
-                        <TableHead className="font-semibold text-slate-700 dark:text-slate-200">
-                          Change Password
-                        </TableHead>
-                        <TableHead className="text-right font-semibold text-slate-700 dark:text-slate-200">
-                          User Edit
-                        </TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {isLoading ? (
-                        <>
-                          <TableRow>
-                            <TableCell colSpan={9} className="py-10">
-                              <div className="flex items-center justify-center">
-                                <Loader className="h-10 w-10 animate-spin" />
-                              </div>
-                            </TableCell>
-                          </TableRow>
-                        </>
-                      ) : users.length > 0 ? (
-                        users.map((user) => (
-                          <TableRow
-                            key={user.id}
-                            className="group border-white/20 dark:border-slate-800 hover:bg-white/40 dark:hover:bg-slate-800/40 transition-colors duration-300"
-                          >
-                            <TableCell>
-                              <Checkbox
-                                className="border-slate-300 dark:border-slate-600"
-                                checked={selectedRows.includes(user.id)}
-                                disabled={loginUser.id == user.id}
-                                onCheckedChange={(checked) =>
-                                  handleSelectRow(user.id, checked)
-                                }
-                              />
-                            </TableCell>
-                            <TableCell className="font-medium text-slate-600 dark:text-slate-400">
-                              #{user.id}
-                            </TableCell>
-                            <TableCell
-                              onClick={() => handleUserDetail(user.id)}
-                              className="font-semibold text-slate-800 dark:text-slate-200"
-                            >
-                              {user.name}
-                            </TableCell>
-                            <TableCell className="text-slate-500 dark:text-slate-400 max-w-62.5 truncate">
-                              {user.email}
-                            </TableCell>
-                            <TableCell>
-                              <span className="px-3 py-1 rounded-full text-xs font-medium bg-white/60 dark:bg-slate-800 border border-white/80 dark:border-slate-700 shadow-sm text-slate-600 dark:text-slate-300">
-                                {user.role ? "User" : "Admin"}
-                              </span>
-                            </TableCell>
-                            <TableCell className="text-slate-500 dark:text-slate-500 italic text-xs">
-                              {user.lock_flg ? "Lock" : "Unlock"}
-                            </TableCell>
-                            <TableCell className="text-slate-500 dark:text-slate-500 italic text-xs">
-                              {dayjs(user.created_at).format("DD/MM/YYYY")}
-                            </TableCell>
-                            <TableCell className="text-slate-500 dark:text-slate-500 italic text-xs">
-                              <Settings />
-                            </TableCell>
-                            <TableCell className="text-right px-6">
-                              <Link to={`/users/edit/${user.id}`}>
-                                <button
-                                  className="px-4 py-1.5 rounded-lg bg-white/80 dark:bg-slate-800 hover:bg-white dark:hover:bg-slate-700 text-indigo-600 dark:text-indigo-400 font-medium
-                                         text-sm shadow-sm border border-white dark:border-slate-700 transition-all hover:scale-105 active:scale-95"
-                                >
-                                  Edit
-                                </button>
-                              </Link>
-                            </TableCell>
-                          </TableRow>
-                        ))
-                      ) : (
-                        <TableRow>
-                          <TableCell
-                            colSpan={9}
-                            className="py-10 text-center text-gray-500 text-lg"
-                          >
-                            No Result...
-                          </TableCell>
+                <div className="rounded-2xl border border-slate-200/60 dark:border-slate-800 bg-white/50 dark:bg-slate-950/50 backdrop-blur-sm shadow-sm overflow-hidden my-3">
+                  <div className="overflow-x-auto">
+                    <Table className="w-full border-collapse min-w-[1000px] table-fixed">
+                      <TableHeader className="bg-slate-50/80 dark:bg-slate-900/80 backdrop-blur-md">
+                        <TableRow className="hover:bg-transparent border-b border-slate-200/60 dark:border-slate-800">
+                          <TableHead className="w-[60px] pl-6">
+                            <Checkbox
+                              className="border-slate-300 dark:border-slate-600 data-[state=checked]:bg-sky-500 data-[state=checked]:border-sky-500"
+                              checked={selectedRows.length > 0}
+                              onCheckedChange={(checked) =>
+                                handleSelectAll(checked)
+                              }
+                            />
+                          </TableHead>
+
+                          {/* ID Column */}
+                          <TableHead className="w-[80px] font-bold text-slate-600 dark:text-slate-300 uppercase text-[11px] tracking-wider py-4">
+                            ID
+                          </TableHead>
+
+                          {/* Name Column */}
+                          <TableHead className="w-[15%] font-bold text-slate-600 dark:text-slate-300 uppercase text-[11px] tracking-wider py-4">
+                            Name
+                          </TableHead>
+
+                          {/* Email Column */}
+                          <TableHead className="w-[25%] font-bold text-slate-600 dark:text-slate-300 uppercase text-[11px] tracking-wider py-4">
+                            Email
+                          </TableHead>
+
+                          {/* Role Column */}
+                          <TableHead className="w-[100px] font-bold text-slate-600 dark:text-slate-300 uppercase text-[11px] tracking-wider py-4">
+                            Role
+                          </TableHead>
+
+                          {/* Status Column */}
+                          <TableHead className="w-[100px] font-bold text-slate-600 dark:text-slate-300 uppercase text-[11px] tracking-wider py-4">
+                            Status
+                          </TableHead>
+
+                          {/* Created Date Column */}
+                          <TableHead className="w-[130px] font-bold text-slate-600 dark:text-slate-300 uppercase text-[11px] tracking-wider py-4 text-center">
+                            Created Date
+                          </TableHead>
+
+                          {/* Change Password */}
+                          <TableHead className="w-[140px] font-bold text-slate-600 dark:text-slate-300 uppercase text-[11px] tracking-wider py-4 text-center">
+                            Change Password
+                          </TableHead>
+
+                          {/* User Edit */}
+                          <TableHead className="w-[120px] text-right font-bold text-slate-600 dark:text-slate-300 uppercase text-[11px] tracking-wider py-4 pr-6">
+                            User Edit
+                          </TableHead>
                         </TableRow>
-                      )}
-                    </TableBody>
-                  </Table>
-                </div>
-                {/* Pagination */}
-                <PaginationLayout meta={meta} setPage={setPage} />
-                <Dialog
-                  open={openDetailDialog}
-                  onOpenChange={setOpenDetailDialog}
-                >
-                  <DialogContent className="max-w-md">
-                    <DialogHeader>
-                      <DialogTitle className="text-center text-xl font-bold">
-                        User Detail
-                      </DialogTitle>
-                    </DialogHeader>
+                      </TableHeader>
 
-                    <div className="flex flex-col items-center">
-                      {/* Profile Icon */}
-                      <Avatar className="w-24 h-24 border-2 border-dashed border-slate-300 bg-slate-50 shadow-sm mb-3">
-                        <AvatarImage
-                          src={selectedUser.profile_path || undefined}
-                          className="object-cover"
-                        />
-                        <AvatarFallback className="bg-slate-100 text-slate-400">
-                          <div className="flex flex-col items-center justify-center">
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              stroke="currentColor"
-                              strokeWidth="1"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              className="w-12 h-12 opacity-70"
+                      <TableBody>
+                        {isLoading ? (
+                          <TableRow>
+                            <TableCell
+                              colSpan={9}
+                              className="py-20 text-center"
                             >
-                              <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
-                              <circle cx="12" cy="7" r="4" />
-                            </svg>
-                          </div>
-                        </AvatarFallback>
-                      </Avatar>
-
-                      <div className="w-full space-y-3 px-6">
-                        {[
-                          { label: "Name", value: selectedUser.name },
-                          {
-                            label: "Role",
-                            value: selectedUser.role ? "User" : "Admin",
-                          },
-                          { label: "Email", value: selectedUser.email },
-                          { label: "Phone", value: selectedUser.phone ?? "-" },
-                          {
-                            label: "Date of Birth",
-                            value: selectedUser.dob
-                              ? dayjs(selectedUser.dob).format("DD-MM-YYYY")
-                              : "-",
-                          },
-                          {
-                            label: "Address",
-                            value: selectedUser.address ?? "-",
-                          },
-                          {
-                            label: "Created Date",
-                            value: dayjs(selectedUser.created_at).format(
-                              "DD-MM-YYYY",
-                            ),
-                          },
-                          {
-                            label: "Created User",
-                            value: selectedUser.created_user,
-                          },
-                          {
-                            label: "Updated Date",
-                            value: dayjs(selectedUser.updated_at).format(
-                              "DD-MM-YYYY",
-                            ),
-                          },
-                          {
-                            label: "Updated User",
-                            value: selectedUser.updated_user ?? "-",
-                          },
-                        ].map((item, index) => (
-                          <div
-                            key={index}
-                            className="grid grid-cols-5 gap-4 items-center"
-                          >
-                            <span className="col-span-2 text-right font-bold text-gray-700">
-                              {item.label}
-                            </span>
-                            <span className="col-span-3 text-left text-gray-600 pl-4">
-                              {item.value}
-                            </span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Close Button */}
-                    <div className="flex justify-center mt-4">
-                      <button
-                        onClick={() => setOpenDetailDialog(false)}
-                        className="px-6 py-2 bg-gray-200 hover:bg-gray-300 rounded text-sm font-medium transition-colors"
-                      >
-                        Close
-                      </button>
-                    </div>
-                  </DialogContent>
-                </Dialog>
+                              <Loader className="h-10 w-10 animate-spin text-sky-500 mx-auto" />
+                            </TableCell>
+                          </TableRow>
+                        ) : users.length > 0 ? (
+                          users.map((user) => (
+                            <TableRow
+                              key={user.id}
+                              className="group border-b border-slate-100 dark:border-slate-800/50 hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-all duration-200"
+                            >
+                              <TableCell className="pl-6">
+                                <Checkbox
+                                  className="border-slate-300 dark:border-slate-600"
+                                  checked={selectedRows.includes(user.id)}
+                                  disabled={loginUser.id == user.id}
+                                  onCheckedChange={(checked) =>
+                                    handleSelectRow(user.id, checked)
+                                  }
+                                />
+                              </TableCell>
+                              <TableCell className="font-mono text-xs text-slate-400">
+                                #{user.id}
+                              </TableCell>
+                              <TableCell
+                                onClick={() => handleUserDetail(user.id)}
+                                className="font-semibold text-slate-700 dark:text-slate-200 cursor-pointer hover:text-sky-500 hover:underline truncate"
+                              >
+                                {user.name}
+                              </TableCell>
+                              <TableCell className="text-slate-500 dark:text-slate-400 truncate text-sm">
+                                {user.email}
+                              </TableCell>
+                              <TableCell>
+                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-medium border bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+                                  {user.role ? "User" : "Admin"}
+                                </span>
+                              </TableCell>
+                              <TableCell>
+                                <div className="flex items-center gap-2">
+                                  <div
+                                    className={`h-1.5 w-1.5 rounded-full ${user.lock_flg ? "bg-red-500" : "bg-emerald-500"}`}
+                                  />
+                                  <span className="text-xs font-medium text-slate-600 dark:text-slate-400">
+                                    {user.lock_flg ? "Lock" : "Unlock"}
+                                  </span>
+                                </div>
+                              </TableCell>
+                              <TableCell className="text-xs text-slate-500 dark:text-slate-500 italic text-center">
+                                {dayjs(user.created_at).format("DD/MM/YYYY")}
+                              </TableCell>
+                              <TableCell className="text-center">
+                                <button className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 transition-colors">
+                                  <Settings className="h-4 w-4" />
+                                </button>
+                              </TableCell>
+                              <TableCell className="text-right pr-6">
+                                <Link to={`/users/edit/${user.id}`}>
+                                  <button
+                                    className="inline-flex items-center justify-center rounded-lg px-4 py-1.5 cursor-pointer
+                                  text-xs font-semibold border border-slate-200 dark:border-slate-700 bg-white
+                                  dark:bg-slate-800 text-indigo-600 shadow-sm transition-all hover:scale-105 active:scale-95"
+                                  >
+                                    Edit
+                                  </button>
+                                </Link>
+                              </TableCell>
+                            </TableRow>
+                          ))
+                        ) : (
+                          <TableRow>
+                            <TableCell
+                              colSpan={9}
+                              className="py-10 text-center text-slate-500"
+                            >
+                              No Result...
+                            </TableCell>
+                          </TableRow>
+                        )}
+                      </TableBody>
+                    </Table>
+                  </div>
+                </div>
+                <PaginationLayout meta={meta} setPage={setPage} />
               </div>
             </div>
           </div>
         </SidebarInset>
       </SidebarProvider>
+
+      <Dialog open={openDetailDialog} onOpenChange={setOpenDetailDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-center text-xl font-bold">
+              User Detail
+            </DialogTitle>
+          </DialogHeader>
+
+          <div className="flex flex-col items-center">
+            <Avatar className="w-24 h-24 border-2 border-dashed border-slate-300 bg-slate-50 shadow-sm mb-3">
+              <AvatarImage
+                src={selectedUser.profile_path || undefined}
+                className="object-cover"
+              />
+              <AvatarFallback className="bg-slate-100 text-slate-400">
+                <div className="flex flex-col items-center justify-center">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="w-12 h-12 opacity-70"
+                  >
+                    <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
+                    <circle cx="12" cy="7" r="4" />
+                  </svg>
+                </div>
+              </AvatarFallback>
+            </Avatar>
+
+            <div className="w-full space-y-3 px-6">
+              {[
+                { label: "Name", value: selectedUser.name },
+                {
+                  label: "Role",
+                  value: selectedUser.role ? "User" : "Admin",
+                },
+                { label: "Email", value: selectedUser.email },
+                { label: "Phone", value: selectedUser.phone ?? "-" },
+                {
+                  label: "Date of Birth",
+                  value: selectedUser.dob
+                    ? dayjs(selectedUser.dob).format("DD-MM-YYYY")
+                    : "-",
+                },
+                {
+                  label: "Address",
+                  value: selectedUser.address ?? "-",
+                },
+                {
+                  label: "Created Date",
+                  value: dayjs(selectedUser.created_at).format("DD-MM-YYYY"),
+                },
+                {
+                  label: "Created User",
+                  value: selectedUser.created_user,
+                },
+                {
+                  label: "Updated Date",
+                  value: dayjs(selectedUser.updated_at).format("DD-MM-YYYY"),
+                },
+                {
+                  label: "Updated User",
+                  value: selectedUser.updated_user ?? "-",
+                },
+              ].map((item, index) => (
+                <div
+                  key={index}
+                  className="grid grid-cols-5 gap-4 items-center"
+                >
+                  <span className="col-span-2 text-right font-bold text-gray-700">
+                    {item.label}
+                  </span>
+                  <span className="col-span-3 text-left text-gray-600 pl-4">
+                    {item.value}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="flex justify-center mt-4">
+            <button
+              onClick={() => setOpenDetailDialog(false)}
+              className="px-6 py-2 bg-gray-200 hover:bg-gray-300 rounded text-sm font-medium transition-colors"
+            >
+              Close
+            </button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </>
   );
 };

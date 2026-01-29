@@ -47,7 +47,6 @@ export const createUserSchema = z.object({
 
 export type CreateUserForm = z.infer<typeof createUserSchema>;
 
-
 // UpdateUser Schema
 export const updateUserSchema = z.object({
     name: z.string().min(1, "Name field is required"),

@@ -1,29 +1,33 @@
 // user.api.ts
-import type { SearchType } from "@/types/data_type";
+import type { SearchUserType } from "@/types/data_type";
 import api from "./api";
 
 // Get Login User Api
-export const getLoginUserApi = () => api.get("/api/login_user")
+export const getLoginUserApi = () => api.get("/api/login_user");
 
 // Get All User Api
 export const getUsersApi = (page = 1, perPage = 10) => {
     return api.get("/api/users", {
         params: {
             page,
-            per_page: perPage
-        }
+            per_page: perPage,
+        },
     });
-}
+};
 
 // Search Users Api
-export const searchUsersApi = (data: SearchType, page = 1, perPage = 10) => {
+export const searchUsersApi = (
+    data: SearchUserType,
+    page = 1,
+    perPage = 10,
+) => {
     return api.post("/api/users/search", data, {
         params: {
             page,
-            per_page: perPage
-        }
+            per_page: perPage,
+        },
     });
-}
+};
 
 // users lock/unlock api
 export const lockUsersApi = (data: { user_ids: number[]; lock_flg: 0 | 1 }) =>
@@ -31,23 +35,22 @@ export const lockUsersApi = (data: { user_ids: number[]; lock_flg: 0 | 1 }) =>
 
 // user create api
 export const createUserApi = (formData: FormData) =>
-    api.post("/api/users/create", formData,
-    {
+    api.post("/api/users/create", formData, {
         headers: { "Content-Type": "multipart/form-data" },
     });
 
 // get single user api
-export const getSingleUserApi = (userId: number) => api.get(`/api/users/${userId}`)
+export const getSingleUserApi = (userId: number) =>
+    api.get(`/api/users/${userId}`);
 
 // update user
 export const updateUserApi = (userId: number, formData: FormData) =>
-    api.put(`/api/users/${userId}`, formData,
-    {
+    api.put(`/api/users/${userId}`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
     });
 
 // delete user
 export const deleteUsersApi = (user_ids: number[]) =>
     api.delete("/api/users/delete", {
-        data: { user_ids }
+        data: { user_ids },
     });

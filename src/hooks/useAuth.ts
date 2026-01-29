@@ -33,6 +33,7 @@ export const useLogin = () => {
             const res = await loginApi(data);
             const { message, data: result } = res.data;
             localStorage.setItem("token", result.access_token);
+            localStorage.setItem("refresh_token", result.refresh_token);
             toast.success(message);
             navigate("/posts");
         } catch (err: any) {
