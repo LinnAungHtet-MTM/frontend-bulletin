@@ -22,3 +22,16 @@ export const updatePostSchema = z.object({
 });
 
 export type UpdatePostForm = z.infer<typeof updatePostSchema>;
+
+// UpdatePost Schema
+export const PostCsvImportSchema = z.object({
+    file: z
+        .any()
+        .refine((files) => files?.length === 1, "CSV File is required")
+        .refine(
+            (files) => files?.[0]?.name.endsWith(".csv"),
+            "Only CSV files are allowed",
+        ),
+});
+
+export type PostCsvImportForm = z.infer<typeof PostCsvImportSchema>;

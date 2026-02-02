@@ -1,9 +1,14 @@
 import {
+    changePasswordApi,
     createUserApi,
     getLoginUserApi,
     getSingleUserApi,
     updateUserApi,
 } from "@/provider/user.api";
+import {
+    ResetPasswordSchema,
+    type ResetPasswordForm,
+} from "@/schemas/auth.schema";
 import {
     createUserSchema,
     updateUserSchema,
@@ -222,7 +227,7 @@ export const useUserProfile = () => {
         reset({
             name: "",
             email: "",
-            role: "",
+            role: "1",
             phone: "",
             dob: undefined,
             address: "",
@@ -277,4 +282,48 @@ export const useUserProfile = () => {
         profilePreview,
         setProfilePreview,
     };
+};
+
+// ChangePasswork hook
+export const useChangePassword = (userId?: number) => {
+    const form = useForm<ResetPasswordForm>({
+        resolver: zodResolver(ResetPasswordSchema),
+    });
+
+    const { reset } = form;
+    const [isLoading, setIsLoading] = useState(false);
+
+    const onReset = () => {
+        reset({
+            password: "",
+            confirm_password: "",
+        });
+    };
+
+    const onSubmit = async (data: ResetPasswordForm) => {
+        if (!userId) return;
+
+        try {
+            setIsLoading(true);
+            const res = await changePasswordApi(userId, data);
+            const { message } = res.data;
+            toast.success(message);
+            onReset();
+        } catch (err: any) {
+            const res = err.response?.data;
+            // Pydantic / backend validation errors
+            if (Array.isArray(res)) {
+                res.forEach((e) => {
+                    form.setError(e.loc[0] as keyof ResetPasswordForm, {
+                        type: "server",
+                        message: e.msg,
+                    });
+                });
+            }
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    return { ...form, onSubmit, isLoading, onReset };
 };

@@ -64,7 +64,6 @@ import { toast } from "react-toastify";
 import PaginationLayout from "@/components/ui/paginationlayout";
 
 const UserList = () => {
-  const [selectedRows, setSelectedRows] = useState<number[]>([]);
   const [open, setOpen] = useState(false);
   const [open1, setOpen1] = useState(false);
   const [startDate, setStartDate] = useState<Date | undefined>();
@@ -81,6 +80,7 @@ const UserList = () => {
   const [selectedUser, setSelectedUser] = useState<any>({});
   const [isSearching, setIsSearching] = useState(false);
   const [searchPayload, setSearchPayload] = useState<any>(null);
+  const [selectedIds, setSelectedIds] = useState<number[]>([]);
 
   useEffect(() => {
     if (isSearching && searchPayload) {
@@ -114,23 +114,32 @@ const UserList = () => {
     }
   };
 
-  const handleSelectAll = (checked: boolean | string) => {
-    if (checked) {
-      const allIds = users
-        .filter((user) => user.id !== loginUser.id)
-        .map((user) => user.id);
-      setSelectedRows(allIds);
-    } else {
-      setSelectedRows([]);
-    }
+  const currentPageIds = users
+    .filter((user) => user.id !== loginUser.id)
+    .map((user) => user.id);
+
+  const isAllChecked =
+    currentPageIds.length > 0 &&
+    currentPageIds.every((id) => selectedIds.includes(id));
+
+  const handleCheckAll = (checked: boolean) => {
+    setSelectedIds((prev) => {
+      if (checked === true) {
+        // add current page ids
+        return Array.from(new Set([...prev, ...currentPageIds]));
+      }
+      if (checked === false) {
+        // remove current page ids
+        return prev.filter((id) => !currentPageIds.includes(id));
+      }
+      return prev;
+    });
   };
 
-  const handleSelectRow = (id: number, checked: boolean | string) => {
-    if (checked) {
-      setSelectedRows([...selectedRows, id]);
-    } else {
-      setSelectedRows(selectedRows.filter((rowId) => rowId !== id));
-    }
+  const handleRowCheck = (id: number, checked: boolean) => {
+    setSelectedIds((prev) =>
+      checked ? [...prev, id] : prev.filter((item) => item !== id),
+    );
   };
 
   const handleSearch = async () => {
@@ -165,7 +174,7 @@ const UserList = () => {
   };
 
   const selectedUsersData = users.filter((user) =>
-    selectedRows.includes(user.id),
+    selectedIds.includes(user.id),
   );
   const isAllLocked =
     selectedUsersData.length > 0 &&
@@ -176,7 +185,7 @@ const UserList = () => {
   const handleLockAction = async () => {
     try {
       const res = await lockUsersApi({
-        user_ids: selectedRows,
+        user_ids: selectedIds,
         lock_flg: lockFlg,
       });
       const { message } = res.data;
@@ -184,13 +193,11 @@ const UserList = () => {
 
       setUsers((prev) =>
         prev.map((user) =>
-          selectedRows.includes(user.id)
-            ? { ...user, lock_flg: lockFlg }
-            : user,
+          selectedIds.includes(user.id) ? { ...user, lock_flg: lockFlg } : user,
         ),
       );
 
-      setSelectedRows([]);
+      setSelectedIds([]);
     } catch (err) {
       console.error(err);
     }
@@ -198,16 +205,14 @@ const UserList = () => {
 
   const handleDeleteAction = async () => {
     try {
-      const res = await deleteUsersApi(selectedRows);
+      const res = await deleteUsersApi(selectedIds);
       const { message } = res.data;
       toast.success(message);
 
       // remove deleted users from state
-      setUsers((prev) =>
-        prev.filter((user) => !selectedRows.includes(user.id)),
-      );
+      setUsers((prev) => prev.filter((user) => !selectedIds.includes(user.id)));
 
-      setSelectedRows([]);
+      setSelectedIds([]);
     } catch (err) {
       console.error(err);
     }
@@ -406,9 +411,9 @@ const UserList = () => {
                       </AlertDialogContent>
                     </AlertDialog>
 
-                    {selectedUsersData.length > 0 && (
+                    {selectedIds.length > 0 && (
                       <span className="text-xs text-slate-500 ml-1 animate-in fade-in slide-in-from-left-2">
-                        {selectedUsersData.length} users selected
+                        {selectedIds.length} users selected
                       </span>
                     )}
                   </div>
@@ -426,9 +431,9 @@ const UserList = () => {
                           <TableHead className="w-[60px] pl-6">
                             <Checkbox
                               className="border-slate-300 dark:border-slate-600 data-[state=checked]:bg-sky-500 data-[state=checked]:border-sky-500"
-                              checked={selectedRows.length > 0}
+                              checked={isAllChecked}
                               onCheckedChange={(checked) =>
-                                handleSelectAll(checked)
+                                handleCheckAll(checked as boolean)
                               }
                             />
                           </TableHead>
@@ -494,10 +499,10 @@ const UserList = () => {
                               <TableCell className="pl-6">
                                 <Checkbox
                                   className="border-slate-300 dark:border-slate-600"
-                                  checked={selectedRows.includes(user.id)}
+                                  checked={selectedIds.includes(user.id)}
                                   disabled={loginUser.id == user.id}
                                   onCheckedChange={(checked) =>
-                                    handleSelectRow(user.id, checked)
+                                    handleRowCheck(user.id, checked as boolean)
                                   }
                                 />
                               </TableCell>
@@ -532,9 +537,14 @@ const UserList = () => {
                                 {dayjs(user.created_at).format("DD/MM/YYYY")}
                               </TableCell>
                               <TableCell className="text-center">
-                                <button className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 transition-colors">
-                                  <Settings className="h-4 w-4" />
-                                </button>
+                                <Link
+                                  to="/user/change-password"
+                                  state={{ userId: user.id }}
+                                >
+                                  <button className="p-2 rounded-lg cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 transition-colors">
+                                    <Settings className="h-4 w-4" />
+                                  </button>
+                                </Link>
                               </TableCell>
                               <TableCell className="text-right pr-6">
                                 <Link to={`/users/edit/${user.id}`}>

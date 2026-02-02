@@ -10,25 +10,37 @@ import UserEdit from "./pages/users/edit";
 import UserProfile from "./pages/users/profile";
 import PostCreate from "./pages/posts/create";
 import PostEdit from "./pages/posts/edit";
+import ChangePassword from "./pages/users/changePassword";
+import PostUpload from "./pages/posts/upload";
+import { AuthProvider } from "./context/AuthProvider";
+import RoleGuard from "./middleware/roleGuard";
 
 function App() {
   return (
     <>
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Login />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/reset-password" element={<ResetPassword />} />
-          <Route element={<ProtectedRoute />}>
-            <Route path="/posts" element={<PostList />} />
-            <Route path="/posts/create" element={<PostCreate />} />
-            <Route path="posts/edit/:postId" element={<PostEdit />} />
-            <Route path="/users" element={<UserList />} />
-            <Route path="users/create" element={<UserCreate />} />
-            <Route path="users/edit/:userId" element={<UserEdit />} />
-            <Route path="user/profile" element={<UserProfile />} />
-          </Route>
-        </Routes>
+        <AuthProvider>
+          <Routes>
+            <Route path="/" element={<Login />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
+            {/* logged user */}
+            <Route element={<ProtectedRoute />}>
+              <Route path="/posts" element={<PostList />} />
+              <Route path="/posts/create" element={<PostCreate />} />
+              <Route path="/posts/edit/:postId" element={<PostEdit />} />
+              <Route path="/posts/upload" element={<PostUpload />} />
+              <Route path="user/profile" element={<UserProfile />} />
+              {/* Admin only */}
+              <Route element={<RoleGuard allow={["admin"]} />}>
+                <Route path="/users" element={<UserList />} />
+                <Route path="users/create" element={<UserCreate />} />
+                <Route path="users/edit/:userId" element={<UserEdit />} />
+                <Route path="user/change-password" element={<ChangePassword />} />
+              </Route>
+            </Route>
+          </Routes>
+        </AuthProvider>
       </BrowserRouter>
     </>
   );

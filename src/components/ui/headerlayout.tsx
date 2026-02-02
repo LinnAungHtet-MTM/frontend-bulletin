@@ -38,8 +38,13 @@ import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import dayjs from "dayjs";
 import { getLoginUserApi } from "@/provider/user.api";
+import { logoutApi } from "@/provider/auth.api";
+import { setAccessToken } from "@/provider/api";
+import { useAuth } from "@/context/AuthProvider";
+import User from "../../assets/user.jpg";
 
 export default function HeaderLayout() {
+  const { logout, role } = useAuth();
   const navigate = useNavigate();
 
   const [user, setUser] = useState<any>(null);
@@ -48,10 +53,14 @@ export default function HeaderLayout() {
     getLoginUserApi().then((res) => setUser(res.data?.data));
   }, []);
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    setUser(null);
-    navigate("/");
+  const handleLogout = async () => {
+    try {
+      await logoutApi();
+      setAccessToken(null);
+      logout();
+    } finally {
+      navigate("/", { replace: true });
+    }
   };
 
   return (
@@ -85,34 +94,36 @@ export default function HeaderLayout() {
           <SidebarMenu>
             {/* User Collapsible Menu */}
             <Collapsible asChild className="group/collapsible mb-3">
-              <SidebarMenuItem>
-                <CollapsibleTrigger asChild>
-                  <SidebarMenuButton tooltip="User">
-                    <CircleUserRound />
-                    <span>Users</span>
-                    <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
-                  </SidebarMenuButton>
-                </CollapsibleTrigger>
+              {role === "admin" && (
+                <SidebarMenuItem>
+                  <CollapsibleTrigger asChild>
+                    <SidebarMenuButton tooltip="User">
+                      <CircleUserRound />
+                      <span>Users</span>
+                      <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
+                    </SidebarMenuButton>
+                  </CollapsibleTrigger>
 
-                <CollapsibleContent>
-                  <SidebarMenuSub>
-                    <SidebarMenuSubItem>
-                      <SidebarMenuSubButton asChild>
-                        <Link to="/users">
-                          <span>User List</span>
-                        </Link>
-                      </SidebarMenuSubButton>
-                    </SidebarMenuSubItem>
-                    <SidebarMenuSubItem>
-                      <SidebarMenuSubButton asChild>
-                        <Link to="/users/create">
-                          <span>User Create</span>
-                        </Link>
-                      </SidebarMenuSubButton>
-                    </SidebarMenuSubItem>
-                  </SidebarMenuSub>
-                </CollapsibleContent>
-              </SidebarMenuItem>
+                  <CollapsibleContent>
+                    <SidebarMenuSub>
+                      <SidebarMenuSubItem>
+                        <SidebarMenuSubButton asChild>
+                          <Link to="/users">
+                            <span>User List</span>
+                          </Link>
+                        </SidebarMenuSubButton>
+                      </SidebarMenuSubItem>
+                      <SidebarMenuSubItem>
+                        <SidebarMenuSubButton asChild>
+                          <Link to="/users/create">
+                            <span>User Create</span>
+                          </Link>
+                        </SidebarMenuSubButton>
+                      </SidebarMenuSubItem>
+                    </SidebarMenuSub>
+                  </CollapsibleContent>
+                </SidebarMenuItem>
+              )}
             </Collapsible>
 
             {/* Post Collapsible Menu */}
@@ -130,16 +141,16 @@ export default function HeaderLayout() {
                   <SidebarMenuSub>
                     <SidebarMenuSubItem>
                       <SidebarMenuSubButton asChild>
-                        <a href="/posts">
+                        <Link to="/posts">
                           <span>Post List</span>
-                        </a>
+                        </Link>
                       </SidebarMenuSubButton>
                     </SidebarMenuSubItem>
                     <SidebarMenuSubItem>
                       <SidebarMenuSubButton asChild>
-                        <a href="/posts/create">
+                        <Link to="/posts/create">
                           <span>Post Create</span>
-                        </a>
+                        </Link>
                       </SidebarMenuSubButton>
                     </SidebarMenuSubItem>
                   </SidebarMenuSub>
@@ -160,7 +171,7 @@ export default function HeaderLayout() {
                   className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
                 >
                   <img
-                    src="https://github.com/shadcn.png"
+                    src={user?.profile_path ? user.profile_path : User}
                     className="size-8 rounded-lg"
                     alt="user"
                   />
@@ -183,7 +194,7 @@ export default function HeaderLayout() {
                 <DropdownMenuLabel className="p-0 font-normal">
                   <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                     <img
-                      src="https://github.com/shadcn.png"
+                      src={user?.profile_path ? user.profile_path : User}
                       className="size-8 rounded-lg"
                       alt="user"
                     />

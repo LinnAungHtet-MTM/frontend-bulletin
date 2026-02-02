@@ -1,11 +1,12 @@
+import { useAuth } from "@/context/AuthProvider";
 import { Navigate, Outlet } from "react-router-dom";
 
 const ProtectedRoute = () => {
-  const token = localStorage.getItem("token");
+  const { isAuthenticated, checked } = useAuth();
 
-  if (!token) {
-    return <Navigate to="/" replace />;
-  }
+  if (!checked) return null;
+
+  if (!isAuthenticated) return <Navigate to="/" replace />;
 
   return <Outlet />;
 };

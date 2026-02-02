@@ -1,76 +1,61 @@
 // api.ts
 import axios from "axios";
 
-const api = axios.create({ baseURL: import.meta.env.VITE_API_BASE_URL });
-
-api.interceptors.request.use((config) => {
-    // custom flag
-    if (config.headers?.skipAuth) {
-        return config;
-    }
-
-    const token = localStorage.getItem("token");
-    if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
+const api = axios.create({
+  baseURL: import.meta.env.VITE_API_BASE_URL,
+  withCredentials: true,
 });
 
-const getAccessToken = () => localStorage.getItem("token");
-const getRefreshToken = () => localStorage.getItem("refresh_token");
+let accessToken: string | null = null;
 
-const setAccessToken = (token: string) => {
-    localStorage.setItem("token", token);
+export const setAccessToken = (token: string | null) => {
+  accessToken = token;
 };
+export const getAccessToken = () => accessToken;
 
-let refreshPromise: Promise<string> | null = null;
+// Request interceptor
+const getCookie = (name: string) =>
+  document.cookie
+    .split("; ")
+    .find((row) => row.startsWith(name + "="))
+    ?.split("=")[1];
 
-const refreshAccessToken = async (): Promise<string> => {
-    if (!refreshPromise) {
-        refreshPromise = axios
-            .post(
-                `${import.meta.env.VITE_API_BASE_URL}/auth/refresh`,
-                {},
-                {
-                    headers: {
-                        Authorization: `Bearer ${getRefreshToken()}`,
-                    },
-                },
-            )
-            .then((res) => {
-                const newToken = res.data.data.access_token;
-                setAccessToken(newToken);
-                return newToken;
-            })
-            .finally(() => {
-                refreshPromise = null;
-            });
-    }
+api.interceptors.request.use((config) => {
+  if (config.url?.includes("/auth/refresh")) {
+    const csrfToken = getCookie("csrf_refresh_token");
+    if (csrfToken) config.headers["X-CSRF-TOKEN"] = csrfToken;
+  }
 
-    return refreshPromise;
-};
+  if (accessToken) {
+    config.headers.Authorization = `Bearer ${accessToken}`;
+  }
+  return config;
+});
 
+// Response interceptor: auto refresh
 api.interceptors.response.use(
-    (res) => res,
-    async (error) => {
-        const originalRequest = error.config;
+  (res) => res,
+  async (error) => {
+    const original = error.config;
 
-        if (error.response?.status !== 401 || originalRequest._retry) {
-            return Promise.reject(error);
-        }
-
-        originalRequest._retry = true;
-
-        try {
-            const newToken = await refreshAccessToken();
-            originalRequest.headers.Authorization = `Bearer ${newToken}`;
-            return api(originalRequest);
-        } catch (err) {
-            localStorage.clear();
-            window.location.href = "/";
-            return Promise.reject(err);
-        }
-    },
+    if (
+      error.response?.status === 401 &&
+      !original._retry &&
+      !original.url.includes("/auth/refresh")
+    ) {
+      original._retry = true;
+      try {
+        const res = await api.post("/auth/refresh");
+        setAccessToken(res.data.access_token);
+        original.headers.Authorization = `Bearer ${res.data.access_token}`;
+        return api(original);
+      } catch {
+        setAccessToken(null);
+        window.location.replace("/");
+      }
+    }
+    return Promise.reject(error);
+  },
 );
 
 export default api;

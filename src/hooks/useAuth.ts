@@ -16,24 +16,30 @@ import {
     resetPasswordApi,
 } from "@/provider/auth.api";
 import { useState } from "react";
+import { useAuth } from "@/context/AuthProvider";
 
 // Login hook
 export const useLogin = () => {
     const navigate = useNavigate();
 
-    const form = useForm<LoginForm>({
+    const form = useForm({
         resolver: zodResolver(loginSchema),
+        defaultValues: {
+            email: "",
+            password: "",
+            remember: false,
+        },
     });
 
     const [isLoading, setIsLoading] = useState(false);
+    const { setAuth } = useAuth();
 
     const onSubmit = async (data: LoginForm) => {
         try {
             setIsLoading(true);
             const res = await loginApi(data);
             const { message, data: result } = res.data;
-            localStorage.setItem("token", result.access_token);
-            localStorage.setItem("refresh_token", result.refresh_token);
+            setAuth(result.access_token);
             toast.success(message);
             navigate("/posts");
         } catch (err: any) {

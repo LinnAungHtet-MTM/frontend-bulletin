@@ -47,3 +47,19 @@ export const deletePostApi = (post_ids: number[]) =>
     api.delete(`/api/posts/delete`, {
         data: { post_ids },
     });
+
+//  post csv export
+export const PostExportApi = (post_ids: number[]) =>
+    api.post(
+        `/api/posts/export`,
+        {
+            post_ids,
+        },
+        { responseType: "blob" },
+    );
+
+// post csv import
+export const PostImportApi = (formData: FormData) =>
+    api.post(`/api/posts/import`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+    });

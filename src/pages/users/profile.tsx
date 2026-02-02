@@ -34,6 +34,7 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
+import { useAuth } from "@/context/AuthProvider";
 import { useUserProfile } from "@/hooks/useUser";
 import dayjs from "dayjs";
 import { CalendarDays, Loader } from "lucide-react";
@@ -43,6 +44,8 @@ import { Controller } from "react-hook-form";
 const UserProfile = () => {
   const [open, setOpen] = useState(false);
   const [openConfirm, setOpenConfirm] = useState(false);
+
+  const { role } = useAuth();
 
   const {
     register,
@@ -139,7 +142,7 @@ const UserProfile = () => {
                                 <Select
                                   onValueChange={field.onChange}
                                   value={field.value}
-                                  disabled={field.value === "1"}
+                                  disabled={role !== "admin"}
                                 >
                                   <SelectTrigger className="w-90">
                                     <SelectValue placeholder="Select Role" />
@@ -302,15 +305,25 @@ const UserProfile = () => {
                           >
                             Reset
                           </Button>
-                          <AlertDialog open={openConfirm}
-                            onOpenChange={setOpenConfirm}>
+                          <AlertDialog
+                            open={openConfirm}
+                            onOpenChange={setOpenConfirm}
+                          >
                             <AlertDialogTrigger asChild>
-                              <Button type="button"
+                              <Button
+                                type="button"
                                 onClick={onValidateConfirm}
                                 className="relative rounded-lg text-white font-medium cursor-pointer bg-sky-500 hover:bg-sky-600
                           transition-all duration-300 hover:scale-[1.02] shadow-[0_4px_14px_0_rgba(14,165,233,0.39)] hover:shadow-sky-500/50"
                               >
-                                Save
+                                {isLoading ? (
+                                  <>
+                                    <Loader className="mr-2 h-4 w-4 animate-spin" />
+                                    Processing...
+                                  </>
+                                ) : (
+                                  "Save"
+                                )}
                               </Button>
                             </AlertDialogTrigger>
                             <AlertDialogContent className="w-110">
@@ -337,14 +350,7 @@ const UserProfile = () => {
                                   className="relative rounded-lg text-white font-medium cursor-pointer bg-sky-500 hover:bg-sky-600
                           transition-all duration-300 hover:scale-[1.02] shadow-[0_4px_14px_0_rgba(14,165,233,0.39)] hover:shadow-sky-500/50"
                                 >
-                                  {isLoading ? (
-                                    <>
-                                      <Loader className="mr-2 h-4 w-4 animate-spin" />
-                                      Processing...
-                                    </>
-                                  ) : (
-                                    "Confirm"
-                                  )}
+                                  Confirm
                                 </AlertDialogAction>
                               </AlertDialogFooter>
                             </AlertDialogContent>

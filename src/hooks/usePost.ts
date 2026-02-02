@@ -1,8 +1,15 @@
-import { createPostApi, getPostApi, updatePostApi } from "@/provider/post.api";
+import {
+  createPostApi,
+  getPostApi,
+  PostImportApi,
+  updatePostApi,
+} from "@/provider/post.api";
 import {
   createPostSchema,
+  PostCsvImportSchema,
   updatePostSchema,
   type CreatePostForm,
+  type PostCsvImportForm,
   type UpdatePostForm,
 } from "@/schemas/post.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -56,6 +63,7 @@ export const useCreatePost = () => {
   return { ...form, onSubmit, isLoading, onReset };
 };
 
+// UpdateUser hook
 export const useUpdatePost = (postId?: number) => {
   const form = useForm<UpdatePostForm>({
     resolver: zodResolver(updatePostSchema),
@@ -124,4 +132,49 @@ export const useUpdatePost = (postId?: number) => {
     onReset,
     isLoading,
   };
+};
+
+// PostCsvImport hook
+export const usePostCsvImport = () => {
+  const form = useForm<PostCsvImportForm>({
+    resolver: zodResolver(PostCsvImportSchema),
+  });
+
+  const [isLoading, setIsLoading] = useState(false);
+  const { reset } = form;
+
+  const onReset = () => {
+    reset();
+  };
+
+  const onSubmit = async (data: PostCsvImportForm) => {
+    try {
+      setIsLoading(true);
+      const file = data.file[0];
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await PostImportApi(formData);
+      const { message } = res.data;
+      toast.success(message);
+      onReset();
+    } catch (err: any) {
+      const res = err.response?.data;
+      if (Array.isArray(res)) {
+        res.forEach((e) => {
+          const field = e.loc?.[0] ?? "file";
+          const rowInfo = e.row ? ` Row ${e.row} =>` : "";
+          form.setError(field as any, {
+            type: "server",
+            message: `${rowInfo} ${e.msg}`,
+          });
+        });
+      } else {
+        toast.error("CSV import failed");
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return { ...form, onSubmit, isLoading, onReset };
 };

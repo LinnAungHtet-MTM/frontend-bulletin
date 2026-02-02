@@ -52,6 +52,7 @@ import {
   deletePostApi,
   getPostApi,
   getPostsApi,
+  PostExportApi,
   searchPostsApi,
 } from "@/provider/post.api";
 import dayjs from "dayjs";
@@ -164,6 +165,19 @@ const PostList = () => {
     } catch (err) {
       console.error(err);
     }
+  };
+
+  const handleDownload = async () => {
+    const res = await PostExportApi(selectedIds);
+    const blob = new Blob([res.data], { type: "text/csv" });
+    const url = window.URL.createObjectURL(blob); // memory-based temporary URL generate
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "posts.csv";
+    a.click();
+
+    window.URL.revokeObjectURL(url);
   };
 
   return (
@@ -279,14 +293,17 @@ const PostList = () => {
                         Create
                       </Button>
                     </Link>
-                    <Button
-                      className="relative rounded-lg text-white font-medium cursor-pointer bg-sky-500 hover:bg-sky-600
+                    <Link to="/posts/upload">
+                      <Button
+                        className="relative rounded-lg text-white font-medium cursor-pointer bg-sky-500 hover:bg-sky-600
                       transition-all duration-300 hover:scale-[1.02] shadow-[0_4px_14px_0_rgba(14,165,233,0.39)] hover:shadow-sky-500/50"
-                    >
-                      Upload
-                    </Button>
+                      >
+                        Upload
+                      </Button>
+                    </Link>
                     <Button
                       disabled={selectedIds.length === 0}
+                      onClick={handleDownload}
                       className="relative rounded-lg text-white font-medium cursor-pointer bg-sky-500 hover:bg-sky-600
                       transition-all duration-300 hover:scale-[1.02] shadow-[0_4px_14px_0_rgba(14,165,233,0.39)] hover:shadow-sky-500/50"
                     >

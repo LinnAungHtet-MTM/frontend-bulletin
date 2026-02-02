@@ -25,3 +25,6 @@ export const verifyResetTokenApi = (token: string) =>
             skipAuth: true,
         },
     });
+
+// Logout Api
+export const logoutApi = () => api.post("/auth/logout");

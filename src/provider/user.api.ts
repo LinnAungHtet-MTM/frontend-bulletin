@@ -1,6 +1,7 @@
 // user.api.ts
 import type { SearchUserType } from "@/types/data_type";
 import api from "./api";
+import type { ResetPasswordForm } from "@/schemas/auth.schema";
 
 // Get Login User Api
 export const getLoginUserApi = () => api.get("/api/login_user");
@@ -54,3 +55,8 @@ export const deleteUsersApi = (user_ids: number[]) =>
     api.delete("/api/users/delete", {
         data: { user_ids },
     });
+
+// change password
+export const changePasswordApi = (userId: number, data: ResetPasswordForm) => {
+    return api.put(`/api/users/${userId}/change_password`, data);
+};

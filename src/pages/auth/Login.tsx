@@ -5,6 +5,7 @@ import { Label } from "@/components/ui/label";
 import { useLogin } from "@/hooks/useAuth";
 import { Eye, EyeOff, Loader, LockKeyhole } from "lucide-react";
 import { useState } from "react";
+import { Controller } from "react-hook-form";
 import { Link } from "react-router-dom";
 
 const Login = () => {
@@ -12,6 +13,7 @@ const Login = () => {
 
   const {
     register,
+    control,
     handleSubmit,
     formState: { errors },
     onSubmit,
@@ -129,7 +131,17 @@ const Login = () => {
 
           <div className="flex items-center justify-between my-4">
             <div className="flex items-center gap-2">
-              <Checkbox id="remember" />
+              <Controller
+                name="remember"
+                control={control}
+                render={({ field }) => (
+                  <Checkbox
+                    id="remember"
+                    checked={field.value}
+                    onCheckedChange={(v) => field.onChange(!!v)}
+                  />
+                )}
+              />
               <Label htmlFor="remember" className="text-gray-500">
                 Remember Me
               </Label>
