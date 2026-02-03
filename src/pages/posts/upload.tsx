@@ -39,7 +39,7 @@ const PostUpload = () => {
               <div className="relative p-4 sm:p-8">
                 <div className="mb-6 flex justify-between items-center">
                   <h2 className="text-2xl font-bold text-slate-800/80 dark:text-slate-100">
-                    Post Create
+                    Post Upload
                   </h2>
                   <Link
                     to="/posts"

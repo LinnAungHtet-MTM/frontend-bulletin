@@ -71,28 +71,36 @@ export const useUpdatePost = (postId?: number) => {
 
   const { reset, setError } = form;
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedPost, setSelectedPost] = useState<UpdatePostForm | null>(null);
 
-  /* ---------------- FETCH & BIND ---------------- */
+  /* ---------------- FETCH ---------------- */
   useEffect(() => {
     if (!postId) return;
 
     getPostApi(postId).then((res) => {
-      const post = res.data?.data;
-
-      reset({
-        title: post.title,
-        description: post.description,
-        status: post.status,
-      });
+      setSelectedPost(res.data?.data);
     });
-  }, [postId, reset]);
+  }, [postId]);
+
+  /* ---------------- BIND ---------------- */
+  useEffect(() => {
+    if (!selectedPost) return;
+
+    reset({
+      title: selectedPost.title,
+      description: selectedPost.description,
+      status: selectedPost.status,
+    });
+  }, [selectedPost, reset]);
 
   /* ---------------- RESET ---------------- */
   const onReset = () => {
+    if (!selectedPost) return;
+
     reset({
-      title: "",
-      description: "",
-      status: 0,
+      title: selectedPost.title,
+      description: selectedPost.description,
+      status: selectedPost.status,
     });
   };
 

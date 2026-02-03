@@ -48,6 +48,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useAuth } from "@/context/AuthProvider";
 import {
   deletePostApi,
   getPostApi,
@@ -77,6 +78,8 @@ const PostList = () => {
   const [openDetailDialog, setOpenDetailDialog] = useState(false);
   const [selectedPost, setSelectedPost] = useState<any>({});
   const perPage = 10;
+
+  const { role } = useAuth();
 
   useEffect(() => {
     if (isSearching && searchPayload) {
@@ -205,102 +208,109 @@ const PostList = () => {
                     Manage and organize your posts with ease.
                   </p>
                 </div>
+                {(role === "admin" || role === "member") && (
+                  <div className="flex flex-col gap-4 mb-4">
+                    {/* Search inputs grid */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 xl:flex items-end gap-3">
+                      <div className="flex flex-col gap-1.5 w-full xl:w-auto">
+                        <Input
+                          value={keyword}
+                          onChange={(e) => setKeyword(e.target.value)}
+                          placeholder="Search Post Title & Description..."
+                          className="w-full xl:w-[300px] bg-white/70 focus-visible:ring-1 focus-visible:ring-sky-500"
+                        />
+                      </div>
 
-                <div className="flex flex-col gap-4 mb-4">
-                  {/* Search inputs grid */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 xl:flex items-end gap-3">
-                    <div className="flex flex-col gap-1.5 w-full xl:w-auto">
-                      <Input
-                        value={keyword}
-                        onChange={(e) => setKeyword(e.target.value)}
-                        placeholder="Search Post & Description..."
-                        className="w-full xl:w-[300px] bg-white/70 focus-visible:ring-1 focus-visible:ring-sky-500"
-                      />
-                    </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full xl:w-auto">
+                        <Select
+                          value={status?.toString()}
+                          onValueChange={setStatus}
+                        >
+                          <SelectTrigger className="w-full xl:w-48">
+                            <SelectValue placeholder="Select Status" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectGroup>
+                              <SelectItem value="0">Inactive</SelectItem>
+                              <SelectItem value="1">Active</SelectItem>
+                            </SelectGroup>
+                          </SelectContent>
+                        </Select>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full xl:w-auto">
-                      <Select
-                        value={status?.toString()}
-                        onValueChange={setStatus}
-                      >
-                        <SelectTrigger className="w-full xl:w-48">
-                          <SelectValue placeholder="Select Status" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectGroup>
-                            <SelectItem value="0">Inactive</SelectItem>
-                            <SelectItem value="1">Active</SelectItem>
-                          </SelectGroup>
-                        </SelectContent>
-                      </Select>
+                        <Popover open={open} onOpenChange={setOpen}>
+                          <PopoverTrigger asChild>
+                            <Button
+                              variant="outline"
+                              id="date"
+                              className="w-full xl:w-48 justify-between font-normal"
+                            >
+                              <span className="truncate">
+                                {date
+                                  ? date.toLocaleDateString()
+                                  : "Search Date"}
+                              </span>
+                              <CalendarDays className="h-4 w-4 opacity-50" />
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-auto p-0" align="start">
+                            <Calendar
+                              mode="single"
+                              selected={date}
+                              captionLayout="dropdown"
+                              onSelect={(d) => {
+                                setDate(d);
+                                setOpen(false);
+                              }}
+                            />
+                          </PopoverContent>
+                        </Popover>
+                      </div>
 
-                      <Popover open={open} onOpenChange={setOpen}>
-                        <PopoverTrigger asChild>
-                          <Button
-                            variant="outline"
-                            id="date"
-                            className="w-full xl:w-48 justify-between font-normal"
-                          >
-                            <span className="truncate">
-                              {date ? date.toLocaleDateString() : "Search Date"}
-                            </span>
-                            <CalendarDays className="h-4 w-4 opacity-50" />
-                          </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0" align="start">
-                          <Calendar
-                            mode="single"
-                            selected={date}
-                            captionLayout="dropdown"
-                            onSelect={(d) => {
-                              setDate(d);
-                              setOpen(false);
-                            }}
-                          />
-                        </PopoverContent>
-                      </Popover>
-                    </div>
-
-                    <div className="flex gap-2 w-full xl:w-auto">
-                      <Button
-                        onClick={handleSearch}
-                        className="relative rounded-lg text-white font-medium cursor-pointer bg-sky-500 hover:bg-sky-600
+                      <div className="flex gap-2 w-full xl:w-auto">
+                        <Button
+                          onClick={handleSearch}
+                          className="relative rounded-lg text-white font-medium cursor-pointer bg-sky-500 hover:bg-sky-600
                       transition-all duration-300 hover:scale-[1.02] shadow-[0_4px_14px_0_rgba(14,165,233,0.39)] hover:shadow-sky-500/50"
-                      >
-                        Search
-                      </Button>
-                      <Button
-                        onClick={handleReset}
-                        className="relative rounded-lg text-white font-medium cursor-pointer bg-red-500 hover:bg-red-600
+                        >
+                          Search
+                        </Button>
+                        <Button
+                          onClick={handleReset}
+                          className="relative rounded-lg text-white font-medium cursor-pointer bg-red-500 hover:bg-red-600
                       transition-all duration-300 hover:scale-[1.02] shadow-[0_4px_14px_0_rgba(14,165,233,0.39)] hover:shadow-sky-500/50"
-                      >
-                        Reset
-                      </Button>
+                        >
+                          Reset
+                        </Button>
+                      </div>
                     </div>
                   </div>
-                </div>
+                )}
               </div>
 
               {/* Table Area */}
               <div className="p-4 sm:p-6 lg:p-8 pt-2">
                 <div className="flex justify-between gap-4 border-slate-100 dark:border-slate-800 pt-4">
                   <div className="flex flex-wrap items-center gap-3">
-                    <Link to="/posts/create">
-                      <Button
-                        className="relative rounded-lg text-white font-medium cursor-pointer bg-sky-500 hover:bg-sky-600
+                    {(role === "admin" || role === "member") && (
+                      <>
+                        <Link to="/posts/create">
+                          <Button
+                            className="relative rounded-lg text-white font-medium cursor-pointer bg-sky-500 hover:bg-sky-600
                       transition-all duration-300 hover:scale-[1.02] shadow-[0_4px_14px_0_rgba(14,165,233,0.39)] hover:shadow-sky-500/50"
-                      >
-                        Create
-                      </Button>
-                    </Link>
-                    <Link to="/posts/upload">
-                      <Button
-                        className="relative rounded-lg text-white font-medium cursor-pointer bg-sky-500 hover:bg-sky-600
+                          >
+                            Create
+                          </Button>
+                        </Link>
+                        <Link to="/posts/upload">
+                          <Button
+                            className="relative rounded-lg text-white font-medium cursor-pointer bg-sky-500 hover:bg-sky-600
                       transition-all duration-300 hover:scale-[1.02] shadow-[0_4px_14px_0_rgba(14,165,233,0.39)] hover:shadow-sky-500/50"
-                      >
-                        Upload
-                      </Button>
-                    </Link>
+                          >
+                            Upload
+                          </Button>
+                        </Link>
+                      </>
+                    )}
                     <Button
                       disabled={selectedIds.length === 0}
                       onClick={handleDownload}
@@ -309,39 +319,41 @@ const PostList = () => {
                     >
                       Download
                     </Button>
-                    <AlertDialog>
-                      <AlertDialogTrigger asChild>
-                        <Button
-                          disabled={selectedIds.length === 0}
-                          className="relative rounded-lg text-white font-medium cursor-pointer bg-red-500 hover:bg-red-600
-                      transition-all duration-300 hover:scale-[1.02] shadow-[0_4px_14px_0_rgba(14,165,233,0.39)] hover:shadow-sky-500/50"
-                        >
-                          Delete
-                        </Button>
-                      </AlertDialogTrigger>
-
-                      <AlertDialogContent className="max-w-md">
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>Delete Posts</AlertDialogTitle>
-                          <AlertDialogDescription>
-                            Do you want to delete the selected posts? This
-                            action cannot be undone.
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel className="cursor-pointer">
-                            Cancel
-                          </AlertDialogCancel>
-                          <AlertDialogAction
-                            onClick={handleDeleteAction}
+                    {(role === "admin" || role === "member") && (
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button
+                            disabled={selectedIds.length === 0}
                             className="relative rounded-lg text-white font-medium cursor-pointer bg-red-500 hover:bg-red-600
                       transition-all duration-300 hover:scale-[1.02] shadow-[0_4px_14px_0_rgba(14,165,233,0.39)] hover:shadow-sky-500/50"
                           >
                             Delete
-                          </AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
+                          </Button>
+                        </AlertDialogTrigger>
+
+                        <AlertDialogContent className="max-w-md">
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Delete Posts</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              Do you want to delete the selected posts? This
+                              action cannot be undone.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel className="cursor-pointer">
+                              Cancel
+                            </AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={handleDeleteAction}
+                              className="relative rounded-lg text-white font-medium cursor-pointer bg-red-500 hover:bg-red-600
+                      transition-all duration-300 hover:scale-[1.02] shadow-[0_4px_14px_0_rgba(14,165,233,0.39)] hover:shadow-sky-500/50"
+                            >
+                              Delete
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    )}
 
                     {selectedIds.length > 0 && (
                       <span className="text-xs text-slate-500 ml-1 animate-in fade-in slide-in-from-left-2">
@@ -396,9 +408,11 @@ const PostList = () => {
                           </TableHead>
 
                           {/* User Edit */}
-                          <TableHead className="w-[120px] text-right font-bold text-slate-600 dark:text-slate-300 uppercase text-[11px] tracking-wider py-4 pr-6">
-                            Post Edit
-                          </TableHead>
+                          {(role === "admin" || role === "member") && (
+                            <TableHead className="w-[120px] text-right font-bold text-slate-600 dark:text-slate-300 uppercase text-[11px] tracking-wider py-4 pr-6">
+                              Post Edit
+                            </TableHead>
+                          )}
                         </TableRow>
                       </TableHeader>
 
@@ -449,17 +463,19 @@ const PostList = () => {
                                   ? dayjs(post.created_at).format("DD/MM/YYYY")
                                   : "N/A"}
                               </TableCell>
-                              <TableCell className="text-right pr-6">
-                                <Link to={`/posts/edit/${post.id}`}>
-                                  <button
-                                    className="inline-flex items-center justify-center rounded-lg px-4 py-1.5 cursor-pointer
+                              {(role === "admin" || role === "member") && (
+                                <TableCell className="text-right pr-6">
+                                  <Link to={`/posts/edit/${post.id}`}>
+                                    <button
+                                      className="inline-flex items-center justify-center rounded-lg px-4 py-1.5 cursor-pointer
                                     text-xs font-semibold border border-slate-200 dark:border-slate-700 bg-white
                                     dark:bg-slate-800 text-indigo-600 shadow-sm transition-all hover:scale-105 active:scale-95"
-                                  >
-                                    Edit
-                                  </button>
-                                </Link>
-                              </TableCell>
+                                    >
+                                      Edit
+                                    </button>
+                                  </Link>
+                                </TableCell>
+                              )}
                             </TableRow>
                           ))
                         ) : (

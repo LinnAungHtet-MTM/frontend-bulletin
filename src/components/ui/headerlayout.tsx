@@ -44,13 +44,14 @@ import { useAuth } from "@/context/AuthProvider";
 import User from "../../assets/user.jpg";
 
 export default function HeaderLayout() {
+  const [user, setUser] = useState<any>(null);
   const { logout, role } = useAuth();
   const navigate = useNavigate();
 
-  const [user, setUser] = useState<any>(null);
-
   useEffect(() => {
-    getLoginUserApi().then((res) => setUser(res.data?.data));
+    if (role === "admin" || role === "member") {
+      getLoginUserApi().then((res) => setUser(res.data?.data));
+    }
   }, []);
 
   const handleLogout = async () => {
@@ -177,7 +178,11 @@ export default function HeaderLayout() {
                   />
                   <div className="grid flex-1 text-left text-sm leading-tight">
                     <span className="truncate font-semibold">
-                      {user?.role ? "User" : "Admin"}
+                      {role === "admin" || role === "member"
+                        ? user?.role
+                          ? "User"
+                          : "Admin"
+                        : "Guest"}
                     </span>
                     <span className="truncate text-xs">{user?.name}</span>
                   </div>
@@ -185,51 +190,53 @@ export default function HeaderLayout() {
                 </SidebarMenuButton>
               </DropdownMenuTrigger>
 
-              <DropdownMenuContent
-                className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
-                side="right"
-                align="end"
-                sideOffset={12}
-              >
-                <DropdownMenuLabel className="p-0 font-normal">
-                  <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-                    <img
-                      src={user?.profile_path ? user.profile_path : User}
-                      className="size-8 rounded-lg"
-                      alt="user"
-                    />
-                    <div className="grid flex-1 text-left text-sm leading-tight">
-                      <span className="truncate font-semibold">
-                        {user?.role ? "User" : "Admin"}
-                      </span>
-                      <span className="truncate text-xs">{user?.name}</span>
+              {(role === "admin" || role === "member") && (
+                <DropdownMenuContent
+                  className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
+                  side="right"
+                  align="end"
+                  sideOffset={12}
+                >
+                  <DropdownMenuLabel className="p-0 font-normal">
+                    <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
+                      <img
+                        src={user?.profile_path ? user.profile_path : User}
+                        className="size-8 rounded-lg"
+                        alt="user"
+                      />
+                      <div className="grid flex-1 text-left text-sm leading-tight">
+                        <span className="truncate font-semibold">
+                          {user?.role ? "User" : "Admin"}
+                        </span>
+                        <span className="truncate text-xs">{user?.name}</span>
+                      </div>
                     </div>
-                  </div>
-                </DropdownMenuLabel>
-                <DropdownMenuSeparator />
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
 
-                <DropdownMenuGroup>
-                  <Link to="/user/profile">
-                    <DropdownMenuItem className="cursor-pointer">
-                      <UserRoundCog className="mr-2 size-4" />
-                      Profile
+                  <DropdownMenuGroup>
+                    <Link to="/user/profile">
+                      <DropdownMenuItem className="cursor-pointer">
+                        <UserRoundCog className="mr-2 size-4" />
+                        Profile
+                      </DropdownMenuItem>
+                    </Link>
+                    <DropdownMenuItem
+                      onClick={handleLogout}
+                      className="text-destructive cursor-pointer"
+                    >
+                      <LogOut className="mr-2 size-4" />
+                      Log out
                     </DropdownMenuItem>
-                  </Link>
-                  <DropdownMenuItem
-                    onClick={handleLogout}
-                    className="text-destructive cursor-pointer"
-                  >
-                    <LogOut className="mr-2 size-4" />
-                    Log out
-                  </DropdownMenuItem>
-                </DropdownMenuGroup>
+                  </DropdownMenuGroup>
 
-                <DropdownMenuSeparator />
-                <DropdownMenuItem>
-                  Last Login At -{" "}
-                  {dayjs(user?.last_login_at).format("DD/MM/YYYY")}
-                </DropdownMenuItem>
-              </DropdownMenuContent>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem>
+                    Last Login At -{" "}
+                    {dayjs(user?.last_login_at).format("DD/MM/YYYY")}
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              )}
             </DropdownMenu>
           </SidebarMenuItem>
         </SidebarMenu>

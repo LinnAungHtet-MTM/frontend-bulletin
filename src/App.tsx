@@ -14,6 +14,8 @@ import ChangePassword from "./pages/users/changePassword";
 import PostUpload from "./pages/posts/upload";
 import { AuthProvider } from "./context/AuthProvider";
 import RoleGuard from "./middleware/roleGuard";
+import GuestRoute from "./middleware/guestRoute";
+import NotFound from "./pages/NotFound";
 
 function App() {
   return (
@@ -21,12 +23,14 @@ function App() {
       <BrowserRouter>
         <AuthProvider>
           <Routes>
-            <Route path="/" element={<Login />} />
-            <Route path="/forgot-password" element={<ForgotPassword />} />
-            <Route path="/reset-password" element={<ResetPassword />} />
+            <Route element={<GuestRoute />}>
+              <Route path="/" element={<Login />} />
+              <Route path="/forgot-password" element={<ForgotPassword />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
+            </Route>
+            <Route path="/posts" element={<PostList />} />
             {/* logged user */}
             <Route element={<ProtectedRoute />}>
-              <Route path="/posts" element={<PostList />} />
               <Route path="/posts/create" element={<PostCreate />} />
               <Route path="/posts/edit/:postId" element={<PostEdit />} />
               <Route path="/posts/upload" element={<PostUpload />} />
@@ -36,9 +40,13 @@ function App() {
                 <Route path="/users" element={<UserList />} />
                 <Route path="users/create" element={<UserCreate />} />
                 <Route path="users/edit/:userId" element={<UserEdit />} />
-                <Route path="user/change-password" element={<ChangePassword />} />
+                <Route
+                  path="user/change-password"
+                  element={<ChangePassword />}
+                />
               </Route>
             </Route>
+            <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>
       </BrowserRouter>

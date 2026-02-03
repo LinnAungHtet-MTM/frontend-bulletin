@@ -37,13 +37,14 @@ import {
 import { useAuth } from "@/context/AuthProvider";
 import { useUserProfile } from "@/hooks/useUser";
 import dayjs from "dayjs";
-import { CalendarDays, Loader } from "lucide-react";
-import { useState } from "react";
+import { CalendarDays, Download, Loader, Trash } from "lucide-react";
+import { useRef, useState } from "react";
 import { Controller } from "react-hook-form";
 
 const UserProfile = () => {
   const [open, setOpen] = useState(false);
   const [openConfirm, setOpenConfirm] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const { role } = useAuth();
 
@@ -62,6 +63,11 @@ const UserProfile = () => {
   const onValidateConfirm = handleSubmit(() => {
     setOpenConfirm(true);
   });
+
+  const handleFile = (file?: File) => {
+    if (!file) return;
+    setProfilePreview(URL.createObjectURL(file));
+  };
 
   return (
     <>
@@ -242,58 +248,137 @@ const UserProfile = () => {
                         </div>
                       </div>
 
-                      <div className="flex items-center gap-4">
-                        {/* Profile Image */}
-                        <div className="flex items-center gap-5 w-200">
-                          <div>
-                            <Label className="mb-2">Profile</Label>
-                            <Input
-                              {...register("profile")}
-                              type="file"
-                              className="max-w-[250px] cursor-pointer"
-                              onChange={(e) => {
-                                if (e.target.files?.[0]) {
-                                  setProfilePreview(
-                                    URL.createObjectURL(e.target.files[0]),
-                                  );
-                                }
-                              }}
-                            />
-                            {errors.profile?.message === "string" && (
-                              <p className="text-sm text-red-500 ms-2 mt-1 font-semibold">
-                                {errors.profile.message}
-                              </p>
-                            )}
-                          </div>
-                          <Avatar className="w-24 h-24 border-2 border-dashed border-slate-300 bg-slate-50 shadow-sm">
-                            <AvatarImage
-                              src={profilePreview || undefined}
-                              className="object-cover"
-                            />
-                            <AvatarFallback className="bg-slate-100 text-slate-400">
-                              <div className="flex flex-col items-center justify-center">
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  viewBox="0 0 24 24"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  strokeWidth="1"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  className="w-12 h-12 opacity-70"
+                      {/* Profile */}
+                      <div className="flex flex-col gap-8 max-w-2xl rounded-xl">
+                        <div className="space-y-4">
+                          <Label className="font-bold text-slate-700 dark:text-slate-200">
+                            Profile Photo
+                          </Label>
+
+                          <div className="flex flex-col md:flex-row items-center gap-8 p-6 rounded-2xl border border-slate-100 bg-slate-50/50">
+                            {/* left side image */}
+                            <div className="relative group">
+                              <Avatar
+                                className="w-32 h-32 border-4 border-white shadow-xl ring-1 ring-slate-200 dark:ring-slate-700
+                                  bg-slate-100 dark:bg-slate-800"
+                              >
+                                <AvatarImage
+                                  src={profilePreview ?? undefined}
+                                  className="object-cover"
+                                />
+                                <AvatarFallback
+                                  className="bg-slate-200 dark:bg-slate-700
+                                    text-slate-500 dark:text-slate-300"
                                 >
-                                  <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
-                                  <circle cx="12" cy="7" r="4" />
-                                </svg>
-                                <span className="text-[10px] uppercase font-semibold tracking-wider mt-1">
-                                  Profile
-                                </span>
+                                  <div className="flex flex-col items-center">
+                                    <span className="text-xs font-bold opacity-70">
+                                      NO IMAGE
+                                    </span>
+                                  </div>
+                                </AvatarFallback>
+                              </Avatar>
+
+                              {/* Remove Button - Only shows when image exists */}
+                              {profilePreview && (
+                                <button
+                                  type="button"
+                                  onClick={() => setProfilePreview(null)}
+                                  className="absolute -top-2 -right-2 w-8 h-8 rounded-full
+                                  bg-white dark:bg-slate-800 text-red-500 shadow-lg border
+                                  border-red-100 dark:border-red-900 flex items-center justify-center
+                                  hover:bg-red-50 dark:hover:bg-red-900/30 transition-colors"
+                                  title="Remove Photo"
+                                >
+                                  <Trash className="w-4 h-4 cursor-pointer" />
+                                </button>
+                              )}
+                            </div>
+
+                            {/* right side drag & drop */}
+                            <div
+                              onClick={() => fileInputRef.current?.click()}
+                              onDragOver={(e) => {
+                                e.preventDefault();
+                                e.currentTarget.classList.add(
+                                  "border-blue-500",
+                                  "bg-blue-50",
+                                  "dark:bg-blue-950/30",
+                                );
+                              }}
+                              onDragLeave={(e) => {
+                                e.preventDefault();
+                                e.currentTarget.classList.remove(
+                                  "border-blue-500",
+                                  "bg-blue-50",
+                                  "dark:bg-blue-950/30",
+                                );
+                              }}
+                              onDrop={(e) => {
+                                e.preventDefault();
+                                e.currentTarget.classList.remove(
+                                  "border-blue-500",
+                                  "bg-blue-50",
+                                  "dark:bg-blue-950/30",
+                                );
+                                handleFile(e.dataTransfer.files?.[0]);
+                              }}
+                              className="flex-1 w-full min-h-[128px] cursor-pointer rounded-xl
+                                border-2 border-dashed border-slate-300 dark:border-slate-600
+                                bg-white dark:bg-slate-900 hover:border-blue-400
+                                dark:hover:border-blue-500 hover:bg-slate-50
+                                dark:hover:bg-slate-800 transition-all duration-200
+                                flex flex-col items-center justify-center gap-3 p-4 group"
+                            >
+                              <Controller
+                                name="profile"
+                                control={control}
+                                render={({ field }) => (
+                                  <input
+                                    type="file"
+                                    accept="image/*"
+                                    className="hidden"
+                                    ref={fileInputRef}
+                                    onChange={(e) => {
+                                      field.onChange(e.target.files);
+                                      handleFile(e.target.files?.[0]);
+                                    }}
+                                  />
+                                )}
+                              />
+
+                              <div
+                                className="p-3 rounded-full bg-blue-50 dark:bg-blue-950/40
+                                group-hover:bg-blue-100 dark:group-hover:bg-blue-900/40 transition-colors"
+                              >
+                                <Download className="w-6 h-6 text-blue-600 dark:text-blue-400" />
                               </div>
-                            </AvatarFallback>
-                          </Avatar>
+
+                              <div className="text-center">
+                                <p className="text-sm text-slate-600 dark:text-slate-300">
+                                  <span className="text-blue-600 dark:text-blue-400 font-bold">
+                                    Click to upload
+                                  </span>{" "}
+                                  or drag and drop
+                                </p>
+                                <p
+                                  className="text-xs mt-1 uppercase tracking-wider font-medium
+                                  text-slate-400 dark:text-slate-500"
+                                >
+                                  PNG, JPG, JPEG (Max 2MB)
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                          {/* Error Message */}
+                          {errors.profile && (
+                            <p className="text-sm text-red-500 dark:text-red-400 font-medium flex items-center gap-2 px-2">
+                              {String(errors.profile.message)}
+                            </p>
+                          )}
                         </div>
-                        {/* Rest & Save Button */}
-                        <div className="w-full flex justify-center gap-3">
+
+                        {/* Action Buttons */}
+                        <div className="w-full flex justify-end gap-3">
                           <Button
                             type="button"
                             onClick={() => {

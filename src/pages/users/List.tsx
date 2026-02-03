@@ -589,31 +589,22 @@ const UserList = () => {
           </DialogHeader>
 
           <div className="flex flex-col items-center">
-            <Avatar className="w-24 h-24 border-2 border-dashed border-slate-300 bg-slate-50 shadow-sm mb-3">
+            <Avatar
+              className="w-32 h-32 border-4 border-white shadow-xl ring-1 ring-slate-200 dark:ring-slate-700
+              bg-slate-100 dark:bg-slate-800"
+            >
               <AvatarImage
                 src={selectedUser.profile_path || undefined}
                 className="object-cover"
               />
-              <AvatarFallback className="bg-slate-100 text-slate-400">
-                <div className="flex flex-col items-center justify-center">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="1"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="w-12 h-12 opacity-70"
-                  >
-                    <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
-                    <circle cx="12" cy="7" r="4" />
-                  </svg>
+              <AvatarFallback className="bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-300">
+                <div className="flex flex-col items-center">
+                  <span className="text-xs font-bold opacity-70">NO IMAGE</span>
                 </div>
               </AvatarFallback>
             </Avatar>
 
-            <div className="w-full space-y-3 px-6">
+            <div className="w-full mt-5 space-y-3 px-6">
               {[
                 { label: "Name", value: selectedUser.name },
                 {
