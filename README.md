@@ -21,6 +21,7 @@ This project is a frontend web application built with **React**, **Vite**, and *
 
 ```bash
 git clone https://github.com/LinnAungHtet-MTM/frontend-bulletin.git
+
 cd frontend-bulletin
 ```
 
